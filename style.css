@@ -1,0 +1,34 @@
+* {
+    background:crimson;
+    z-index:-1;
+}
+
+:root {
+
+}
+
+body {
+    margin:0;
+}
+
+header {
+    font-size:2rem;
+}
+
+.btnContainer {
+
+    border:3px solid black;
+}
+
+#btn1, #btn2, #btn3, #btn4 {
+
+
+}
+
+
+footer {
+
+}
+
+/* add font family */
+/* add media query */
