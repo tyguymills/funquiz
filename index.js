@@ -1,11 +1,10 @@
-const startButton = document.querySelector("#startButton");
-var timerDisplay = document.querySelector("#timer");
-const score = document.querySelector("#score");
+var timerDisplay;
+var score;
 var currentQuestion;
 var intervalID;
 var time;
 var isCorrect;
-var userScore = 0;
+var userScore;
 
 
 if(window.localStorage.getItem("highscores") === null){
@@ -18,6 +17,7 @@ function endgame() {
 }
 
 function getInitials() {
+  document.getElementsByTagName("main")[0].innerHTML = "";
   const footer = document.getElementById("endgame");
   footer.innerHTML = `<h2>Game Over</h2><p>Your Final Score is ${userScore}</p><input type="text" placeholder="Enter Your Initials" id="initials"></input><button onclick="saveScore()">Save</button>`
 }
@@ -42,13 +42,15 @@ function displayHighScores() {
   const hs = JSON.parse(window.localStorage.getItem("highscores"))
   const keys = Object.keys(hs)
   const hsli = keys.map(key => `<li>${key} : ${hs[key]}</li>`)
-  document.getElementById("top").innerHTML = `<h1>HIGHSCORES</h1><ul id="highscores"></ul><button onclick="clearScores()">CLEAR HIGHSCORES</button>`
+  document.getElementById("endgame").innerHTML = "";
+  document.getElementsByTagName("main")[0].innerHTML = `<h1>HIGHSCORES</h1><ul id="highscores"></ul><button onclick="clearScores()">CLEAR HIGHSCORES</button>`
   document.getElementById("highscores").innerHTML += hsli.join("");
+  document.getElementById("highscores").innerHTML += "<button onclick='startQuiz()'>Play Again</button>"
 }
 
 function clearScores() {
   window.localStorage.setItem("highscores", "{}")
-  document.getElementById("highscores").innerHTML = "";
+  document.getElementsByTagName("main")[0].innerHTML = "<button onclick='startQuiz()'>Play Again</button>"
 }
 
 // var questionText = document.querySelector("#questionText");
@@ -140,16 +142,13 @@ function clearScores() {
 
 //function to start timer
 function setTime() {
-  console.log("hello")
 //reset time, userscore, and current question (so you can restart quiz by calling this function)
 intervalID = setInterval(function() {
   if(time <= 0) {
     endgame();
 }
   time--;
-  console.log(time)
-  console.log(timerDisplay)
-  timerDisplay.textContent = `${time}`;
+  timerDisplay.textContent = `Time: ${time}`;
 }, 1000);
 }
 
@@ -157,30 +156,36 @@ intervalID = setInterval(function() {
 
 
 function startQuiz() {
-  document.getElementsByTagName("main")[0].innerHTML = `<h1 id="timer">0</h1><h1 id="score">0</h1>
+  document.getElementsByTagName("main")[0].innerHTML = `<h1 id="timer">Time: 0</h1><h1 id="score">Score: 0</h1>
   <button id="startbutton" onclick="startQuiz()">Click Here To Start</button>
   <div id="quiz"></div>`
   currentQuestion = 0;
   time = 90;
+  userScore = 0;
+  timerDisplay = document.querySelector("#timer")
+  score = document.querySelector("#score")
   setTime()
   displayQuestion()
   document.getElementById("startbutton").style="display:none"
 }
 
 function displayQuestion() {
-  let questionDiv = document.getElementById("quiz")
-  let q = quizQuestions[currentQuestion]
-  let qText = q.question
-  const qChoices = q.choices
-  const qAnswer = q.correct
-  let buttonHTML = "";
-  for (i = 0; i < 4; i++) {
-       buttonHTML += `<button style="width:50%;padding:10px 0;background:white;font-weight:bold;" onclick="checkAnswer(currentQuestion,'${quizQuestions[currentQuestion].choices[i]}')">${quizQuestions[currentQuestion].choices[i]}</button><br>`
-       //creates buttons
-     }
-  questionDiv.innerHTML = `<h2>${qText}</h2>`
-  questionDiv.innerHTML += buttonHTML;
-  currentQuestion ++;
+  if(currentQuestion < quizQuestions.length) {
+    let questionDiv = document.getElementById("quiz")
+    let q = quizQuestions[currentQuestion]
+    let qText = q.question
+    const qChoices = q.choices
+    const qAnswer = q.correct
+    let buttonHTML = "";
+    for (i = 0; i < 4; i++) {
+        buttonHTML += `<button style="width:50%;padding:10px 0;background:white;font-weight:bold;" onclick="checkAnswer(currentQuestion,'${quizQuestions[currentQuestion].choices[i]}')">${quizQuestions[currentQuestion].choices[i]}</button><br>`
+        //creates buttons
+      }
+    questionDiv.innerHTML = `<h2>${qText}</h2>`
+    questionDiv.innerHTML += buttonHTML;
+  } else {
+    endgame()
+  }
 }
 
 // function play(){
@@ -206,7 +211,6 @@ function displayQuestion() {
 
 
 function checkAnswer(index,answer) {
-  console.log(index,answer);
   if(answer == quizQuestions[index].correct){
     isCorrect = true;
   }
@@ -221,6 +225,7 @@ function displayResult() {
   if(isCorrect){
     userScore ++;
   }
-  score.textContent = userScore;
+  score.textContent = `Score: ${userScore}`;
+  currentQuestion++;
 }
 
